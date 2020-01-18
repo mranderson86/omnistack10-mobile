@@ -12,6 +12,8 @@ import api from '../services/api';
 function Main({ navigation }) {
 
     const [ devs, setDevs ] = useState([]);
+
+    const [ techs, setTechs ] = useState('');
     // Variável de estado - guarda as coordenadas do usuário
     const [ currentRegion, setCurrentRegion ] = useState(null);
 
@@ -52,24 +54,20 @@ function Main({ navigation }) {
 
         try{
 
-            console.log('consulta');
-
             const response = await api.get('/search', {
-               latitude,
-               longitude,
-                techs: 'ReactJS',
+                params: {
+                    latitude,
+                    longitude,
+                    techs,
+                }
+               
             });
 
-            console.log('dados');
-
-            
-            setDevs(response.data);
+            setDevs(response.data.devs);
 
         }catch(err){
             console.log(err);
         }
-
-        // console.log(response.data);
     }
 
     // Executa toda vez que a localização no mapa mudar.
@@ -86,6 +84,7 @@ function Main({ navigation }) {
         <MapView onRegionChangeComplete={handleRegionChanged}  initialRegion={ currentRegion } style={ styles.map }>
             
             {
+                
 
                 devs.map(dev => (
                     <Marker 
@@ -96,7 +95,7 @@ function Main({ navigation }) {
                             latitude: dev.location.coordinates[1] , 
                         }}
                     >
-                        <Image style={styles.avatar} source={{ uri: dev.avatar }} />
+                        <Image style={styles.avatar} source={{ uri: dev.avatar_url }} />
 
                         <Callout onPress={ ()=> {
                             navigation.navigate('Profile', { github_username: dev.github_username });
@@ -104,7 +103,7 @@ function Main({ navigation }) {
                             <View style={styles.callout}>
                                 <Text style={styles.devName}>{dev.name}</Text>
                                 <Text style={styles.devBio}>{ dev.bio }</Text>
-                                <Text style={styles.devTech}>dev.techs.join(', ')</Text>
+                                <Text style={styles.devTech}>{dev.techs.join(', ')}</Text>
                             </View>
                         </Callout>
 
@@ -120,6 +119,8 @@ function Main({ navigation }) {
                 placeholderTextColor="#999"
                 autoCapitalize="words"
                 autoCorrect={false}
+
+                onChangeText = { (text) => setTechs(text)  }
             />
 
             <TouchableOpacity onPress={ loadDevs } style={styles.loadButton}>
