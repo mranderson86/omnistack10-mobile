@@ -4,6 +4,7 @@ import { createStackNavigator } from 'react-navigation-stack';
 import Main from './pages/Main';
 import Profile from './pages/Profile';
 
+// Cria o menu de navegação entre as páginas Profile e Main.
 const Routes = createAppContainer(
     createStackNavigator({
         Main: {
