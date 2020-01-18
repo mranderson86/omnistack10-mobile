@@ -18,6 +18,15 @@ const Routes = createAppContainer(
                 title: 'Perfil no Github'
             }
         }
+    }, {
+        defaultNavigationOptions: {
+            headerTitleAlign: "center",
+            headerTintColor: "#FFFFFF",
+            headerStyle: {
+                backgroundColor: "#7D40E7",
+            }, 
+            
+        }
     })
 );
 
