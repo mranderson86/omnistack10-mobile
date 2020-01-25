@@ -8,20 +8,19 @@ import {
 import { MaterialIcons } from '@expo/vector-icons';
 
 import api from '../services/api';
+import { connect, disconnect, subscribeToNewDevs } from '../services/socket';
 
 function Main({ navigation }) {
 
     const [ devs, setDevs ] = useState([]);
-
     const [ techs, setTechs ] = useState('');
     // Variável de estado - guarda as coordenadas do usuário
     const [ currentRegion, setCurrentRegion ] = useState(null);
 
     useEffect(() => {
-
         // executa quando o aplicativo inicializa.
         // e consunta a posição do usuário.
-        async function loadInitialPosition(){
+        async function loadInitialPosition() {
 
             // Busca permissão do usuário para usar o recurso do dispositivo
             const { granted } = await requestPermissionsAsync();
@@ -47,6 +46,29 @@ function Main({ navigation }) {
 
     } , []);
 
+    useEffect(()=> { 
+        // função que "inscreve" a aplicação para ser notificada pelo
+        // backend toda vez que um novo dev for cadastrado
+        subscribeToNewDevs(dev => { 
+            //console.log('new dev',dev);
+
+            setDevs([...devs, dev])
+        });
+
+    } , [ devs ]);
+
+    function setupWebSocket() {
+        disconnect();
+
+        const { latitude, longitude } = currentRegion;
+
+        connect(
+            latitude,
+            longitude,
+            techs
+        );
+    }
+
     // Pesquisa por devs dentro de um raio
     // e com tecnologias informadas
     async function loadDevs() {
@@ -64,6 +86,7 @@ function Main({ navigation }) {
             });
 
             setDevs(response.data.devs);
+            setupWebSocket();
 
         }catch(err){
             console.log(err);
